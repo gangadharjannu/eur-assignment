@@ -1,0 +1,163 @@
+body {
+    padding: 10px;
+}
+
+a>sub {
+    padding-left: 10px;
+    font-weight: normal;
+}
+
+#tabs {
+    height: 30px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+#tabs li {
+    list-style: none;
+    border: 1px solid #ccc;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+#tabs li a {
+    display: block;
+    padding: 5px;
+    background-color: #f1f1f1;
+    text-decoration: none;
+    outline: none;
+}
+
+#tabs li.active {
+    border-bottom: solid 1px #f1f1f1;
+    font-weight: bold;
+}
+
+#tabs li.active:after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 1px;
+    position: absolute;
+    bottom: -1px;
+    left: 0px;
+    background-color: #ccc;
+}
+
+.container {
+    background-color: #f1f1f1;
+    border-left: solid 1px #ccc;
+    border-bottom: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    padding-top: 20px;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    height: 100%;
+}
+
+/* contact card styling */
+
+.contact {
+    position: relative;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 50%;
+}
+
+.contact:after {
+    content: '';
+    background: black;
+    position: absolute;
+    bottom: 5px;
+    height: 1px;
+    width: 95%;
+    margin: 0 auto;
+}
+
+.contact .close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+a, .contact .close-icon {
+    cursor: pointer;
+}
+
+.contact .contact-img {
+    float: left;
+    margin-right: 20px;
+}
+
+.contact .contact-img img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.contact h5 {
+    margin-bottom: 10px;
+}
+
+.contact .contact-details {
+    float: left;
+}
+
+.contact .contact-details p>label {
+    width: 100px;
+    float: left;
+    text-align: left;
+}
+
+.contact .contact-user-name {
+    clear: both;
+}
+
+.contact-card {
+    position: absolute;
+    z-index: 2;
+    background: #f1f1f1;
+    top: 0;
+    left: 0;
+    box-shadow: 0px 10px 5px #888, 0px -10px 5px #888;
+    border-radius: 4px;
+    padding: 10px;
+    width: 100%;
+    box-shadow: 0px -10px 5px #ccc, 0px 10px 5px #ccc;
+    margin-right: 50px;
+}
+
+.contact .contact-card {
+    display: none;
+}
+
+.contact.active .contact-card {
+    display: block;
+}
+
+.contact.active .contact-name {
+    display: none;
+}
+
+.contact-user-name {
+    writing-mode: vertical-lr;
+    -webkit-writing-mode: vertical-lr;
+    -ms-writing-mode: vertical-lr;
+    position: absolute;
+    right: 25px;
+    background-color: #ff0000;
+    /* For browsers that do not support gradients */
+    background-image: linear-gradient(to bottom, #ff0000, #fd8a24);
+    top: 0;
+    bottom: 25%;
+    padding: 5px;
+}
+
+@media (max-width: 430px) {
+    #tabs {
+        height: 100%;
+    }
+}
