@@ -160,4 +160,7 @@ a, .contact .close-icon {
     #tabs {
         height: 100%;
     }
+    .contact {
+        width: 100%;
+    }
 }

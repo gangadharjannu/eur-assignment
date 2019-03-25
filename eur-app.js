@@ -3,7 +3,7 @@ $(document).ready(function() {
     var configJSON = {
         title: 'Contact List',
         userUrl: 'https://api.randomuser.me/',
-        numberCards: 20,
+        numberCards: 120,
         tabs: [
             'a',
             'b',
