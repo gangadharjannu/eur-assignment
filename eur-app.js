@@ -1,9 +1,9 @@
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     // config JSON
     var configJSON = {
         title: 'Contact List',
         userUrl: 'https://api.randomuser.me/',
-        numberCards: 120,
+        numberCards: 20,
         tabs: [
             'a',
             'b',
@@ -48,48 +48,72 @@ $(document).ready(function() {
 
         // 1. add header
         updateHeader: function(title) {
-            $('section>header').html('<h1>' + title + '</h2>');
+            document.querySelector('section>header').innerHTML =
+                '<h1>' + title + '</h2>';
         },
 
         generateContactGroupTabs: function(tabs) {
             // 1. generate tabs
-            var ul = $("<ul id='tabs'></ul>");
+            var ul = '<ul id="tabs">';
             var tabsContainer = '';
             tabs.forEach(function(tabName) {
-                ul.append(
+                ul +=
                     '<li><a id="tab' +
-                        tabName.toUpperCase() +
-                        '">' +
-                        tabName +
-                        '<sub>0</sub>' +
-                        '</a></li>'
-                );
+                    tabName.toUpperCase() +
+                    '">' +
+                    tabName +
+                    '<sub>0</sub>' +
+                    '</a></li>';
                 tabsContainer +=
                     '<div class="container" id="tab' +
                     tabName.toUpperCase() +
                     'Content"></div>';
             });
+            ul += '</ul>';
 
-            $('section>main')
-                .append(ul)
-                .append(tabsContainer);
+            document
+                .querySelector('section>main')
+                .insertAdjacentHTML('beforeend', ul + tabsContainer);
 
             // tabs show/hide functionality
-            $('#tabs li:first').addClass('active');
-            $('.container').hide();
-            $('.container:first').show();
+            document.querySelectorAll('#tabs li')[0].classList.add('active');
 
-            $('#tabs li').on('click', function() {
-                var t = $(this)
-                    .children('a')
-                    .attr('id');
-                $(this)
-                    .siblings()
-                    .removeClass('active');
-                $(this).addClass('active');
-                $('.container').hide();
-                $('#' + t + 'Content').show();
+            forEach(document.querySelectorAll('.container'), function(
+                container
+            ) {
+                container.style.display = 'none';
             });
+            document.querySelectorAll('.container')[0].style.display = '';
+
+            document
+                .getElementById('tabs')
+                .addEventListener('click', function(evt) {
+                    var target = evt.target.closest('a');
+                    if (target) {
+                        var tabID = target.id;
+                        forEach(
+                            Array.prototype.slice
+                                .call(target.parentNode.parentNode.children) // convert to array
+                                .filter(function(v) {
+                                    return v !== target.parentNode;
+                                }),
+                            function(tab) {
+                                tab.classList.remove('active');
+                            }
+                        );
+                        target.parentNode.classList.add('active');
+
+                        forEach(
+                            document.querySelectorAll('.container'),
+                            function(container) {
+                                container.style.display = 'none';
+                            }
+                        );
+                        document.getElementById(
+                            tabID + 'Content'
+                        ).style.display = '';
+                    }
+                });
         },
 
         generateContacts: function(contactsLimit, APIUrl) {
@@ -110,8 +134,8 @@ $(document).ready(function() {
                         );
                     }
                 )
-                .catch(function() {
-                    throw Error('fetching contact details failed');
+                .catch(function(error) {
+                    throw Error('fetching contact details failed', error);
                 });
         },
         generateContactTemplate: function(contact) {
@@ -166,6 +190,9 @@ $(document).ready(function() {
             // return array of chunks of given size
             var contactGroups = response.reduce(function(acc, curr) {
                 var contactGroup = curr.name.first[0];
+                if (!/[A-Za-z]+/.test(contactGroup)) {
+                    return [];
+                }
                 acc[contactGroup] = acc[contactGroup] || {
                     tab: contactGroup,
                     children: []
@@ -173,51 +200,99 @@ $(document).ready(function() {
                 acc[contactGroup].children.push(curr);
                 return acc;
             }, {});
-
             //  inject content into corresponding tabs
             Object.keys(contactGroups).forEach(
                 function(group) {
                     if (
                         contactGroups[group].children &&
-                        contactGroups[group].children.length
+                        contactGroups[group].children.length > 0
                     ) {
-                        $('#tab' + group.toUpperCase())
-                            .children('sub')
-                            .text(contactGroups[group].children.length);
-                        $('#tab' + group.toUpperCase() + 'Content').append(
-                            contactGroups[group].children
-                                .map(this.generateContactTemplate.bind(this))
-                                .join('')
-                        );
+                        document.querySelector(
+                            '#tab' + group.toUpperCase() + ' > sub'
+                        ).textContent = contactGroups[group].children.length;
+                        document
+                            .getElementById(
+                                'tab' + group.toUpperCase() + 'Content'
+                            )
+                            .insertAdjacentHTML(
+                                'beforeend',
+                                contactGroups[group].children
+                                    .map(
+                                        this.generateContactTemplate.bind(this)
+                                    )
+                                    .join('')
+                            );
                     }
                 }.bind(this)
             );
 
+            document.body.addEventListener('click', function(evt) {
+                var target = null;
+                // open contact card;
+                target = evt.target.closest('.contact');
+                if (target) {
+                    forEach(
+                        Array.prototype.filter.call(
+                            target.parentNode.children,
+                            function(child) {
+                                return child !== target;
+                            }
+                        ),
+                        function(siblings) {
+                            siblings.classList.remove('active');
+                        }
+                    );
+                    target.classList.add('active');
+                }
+            });
+
             // JS functionality
             // toggling visiblity, collapsible
-            $('body').on('click', '.contact', function() {
-                // $(this).parent().childrens()
-                $(this)
-                    .parent()
-                    .children()
-                    .removeClass('active');
-                $(this).addClass('active');
-            });
-            // close button
-            $('body').on('click', '.close-icon', function(evt) {
-                $(this)
-                    .parents('.contact')
-                    .removeClass('active');
-                evt.stopPropagation();
+            document.body.addEventListener('click', function(evt) {
+                var target = null;
+
+                target = evt.target.matches('.close-icon');
+                // close contact card
+                if (target && evt.target.closest('.contact')) {
+                    evt.target.closest('.contact').classList.remove('active');
+                    evt.stopPropagation();
+                }
             });
         },
         getContactAPI: function(url) {
-            return $.get(url).then(function(res) {
-                return res.results[0];
+            return new Promise(function(resolve, reject) {
+                var x = null;
+                try {
+                    x = new XMLHttpRequest();
+                    x.open('GET', url, true);
+                    x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    x.setRequestHeader('Content-Type', 'application/json');
+                    x.onreadystatechange = function() {
+                        if (x.readyState === 4) {
+                            if (x.status === 200) {
+                                resolve(JSON.parse(x.responseText).results[0]);
+                            } else {
+                                reject(x.statusText);
+                            }
+                        }
+                    };
+                    x.send(null);
+                } catch (e) {
+                    /*eslint-disable no-console */
+                    window.console && console.log(e);
+                    /*eslint-enable no-console */
+                }
             });
         }
     };
 
     // Initialize ContactList
     ContactList.init(configJSON);
+
+    // util functions
+    function forEach(array, callback, scope) {
+        for (var index = 0; index < array.length; index++) {
+            callback.call(scope, array[index], index, array);
+        }
+    }
 });
